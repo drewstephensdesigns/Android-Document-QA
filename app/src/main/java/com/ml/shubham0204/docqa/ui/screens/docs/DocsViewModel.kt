@@ -18,7 +18,9 @@ import setProgressDialogText
 import java.io.File
 import java.io.InputStream
 import java.net.HttpURLConnection
+import java.net.MalformedURLException
 import java.net.URL
+import kotlin.math.min
 
 @KoinViewModel
 class DocsViewModel(
@@ -60,13 +62,17 @@ class DocsViewModel(
         }
     }
 
-    suspend fun addDocumentFromUrl(url: String, context: Context, onDownloadComplete: (Boolean) -> Unit) = withContext(Dispatchers.IO){
+    suspend fun addDocumentFromUrl(
+        url: String,
+        context: Context,
+        onDownloadComplete: (Boolean) -> Unit,
+    ) = withContext(Dispatchers.IO) {
         try {
             val connection = URL(url).openConnection() as HttpURLConnection
             connection.connect()
             if (connection.responseCode == HttpURLConnection.HTTP_OK) {
                 val inputStream = connection.inputStream
-                val fileName = url.substringAfterLast("/")
+                val fileName = getFileNameFromURL(url)
                 val file = File(context.cacheDir, fileName)
 
                 file.outputStream().use { outputStream ->
@@ -75,11 +81,13 @@ class DocsViewModel(
 
                 // Determine the document type based on the file extension
                 // Add handle for unknown types if supported
-                val documentType = when (fileName.substringAfterLast(".", "").lowercase()) {
-                    "pdf" -> Readers.DocumentType.PDF
-                    "docx" -> Readers.DocumentType.MS_DOCX
-                    else -> Readers.DocumentType.UNKNOWN
-                }
+                val documentType =
+                    when (fileName.substringAfterLast(".", "").lowercase()) {
+                        "pdf" -> Readers.DocumentType.PDF
+                        "docx" -> Readers.DocumentType.MS_DOCX
+                        "doc" -> Readers.DocumentType.MS_DOCX
+                        else -> Readers.DocumentType.UNKNOWN
+                    }
 
                 // Pass file to your document handling logic
                 addDocument(file.inputStream(), fileName, documentType)
@@ -92,9 +100,9 @@ class DocsViewModel(
                     onDownloadComplete(false)
                 }
             }
-        } catch (e: Exception){
+        } catch (e: Exception) {
             e.printStackTrace()
-            withContext(Dispatchers.Main){
+            withContext(Dispatchers.Main) {
                 onDownloadComplete(false)
             }
         }
@@ -108,4 +116,33 @@ class DocsViewModel(
     }
 
     fun getDocsCount(): Long = documentsDB.getDocsCount()
+
+    // Extracts the file name from the URL
+    // Source: https://stackoverflow.com/a/11576046/13546426
+    private fun getFileNameFromURL(url: String?): String {
+        if (url == null) {
+            return ""
+        }
+        try {
+            val resource = URL(url)
+            val host = resource.host
+            if (host.isNotEmpty() && url.endsWith(host)) {
+                return ""
+            }
+        } catch (e: MalformedURLException) {
+            return ""
+        }
+        val startIndex = url.lastIndexOf('/') + 1
+        val length = url.length
+        var lastQMPos = url.lastIndexOf('?')
+        if (lastQMPos == -1) {
+            lastQMPos = length
+        }
+        var lastHashPos = url.lastIndexOf('#')
+        if (lastHashPos == -1) {
+            lastHashPos = length
+        }
+        val endIndex = min(lastQMPos.toDouble(), lastHashPos.toDouble()).toInt()
+        return url.substring(startIndex, endIndex)
+    }
 }
