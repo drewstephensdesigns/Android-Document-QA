@@ -21,6 +21,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Folder
+import androidx.compose.material.icons.filled.Key
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -49,13 +50,15 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ml.shubham0204.docqa.R
+import com.ml.shubham0204.docqa.domain.llm.GeminiRemoteAPI
 import com.ml.shubham0204.docqa.ui.theme.DocQATheme
 import dev.jeziellago.compose.markdowntext.MarkdownText
 import org.koin.androidx.compose.koinViewModel
+import kotlin.coroutines.coroutineContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ChatScreen(onOpenDocsClick: (() -> Unit)) {
+fun ChatScreen(onOpenDocsClick: (() -> Unit), onAddKeyClick: () -> Unit) {
     DocQATheme {
         Scaffold(
             modifier = Modifier.fillMaxSize(),
@@ -67,6 +70,13 @@ fun ChatScreen(onOpenDocsClick: (() -> Unit)) {
                             Icon(
                                 imageVector = Icons.Default.Folder,
                                 contentDescription = "Open Documents",
+                            )
+                        }
+
+                        IconButton(onClick = onAddKeyClick) {
+                            Icon(
+                                imageVector = Icons.Default.Key,
+                                contentDescription = "Add API Key",
                             )
                         }
                     },
@@ -227,6 +237,11 @@ private fun QueryInput(chatViewModel: ChatViewModel) {
             modifier = Modifier.background(Color.Blue, CircleShape),
             onClick = {
                 keyboardController?.hide()
+                if (!chatViewModel.validateApiKey()){
+                    Toast.makeText(context, "Please add an API key before querying", Toast.LENGTH_LONG).show()
+                    return@IconButton
+                }
+
                 if (!chatViewModel.canGenerateAnswers()) {
                     Toast
                         .makeText(context, "Add documents to execute queries", Toast.LENGTH_LONG)

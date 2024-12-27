@@ -1,6 +1,7 @@
 package com.ml.shubham0204.docqa.ui.screens.docs
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.ml.shubham0204.docqa.data.Chunk
 import com.ml.shubham0204.docqa.data.ChunksDB
@@ -42,7 +43,7 @@ class DocsViewModel(
                 ),
             )
         setProgressDialogText("Creating chunks...")
-        val chunks = WhiteSpaceSplitter.createChunks(text, chunkSize = 500, chunkOverlap = 50)
+        val chunks = WhiteSpaceSplitter.createChunks(text, chunkSize = 500)
         setProgressDialogText("Adding chunks to database...")
         val size = chunks.size
         chunks.forEachIndexed { index, s ->

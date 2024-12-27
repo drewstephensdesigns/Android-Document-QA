@@ -7,7 +7,7 @@ plugins {
     id("com.google.devtools.ksp")
 }
 
-val geminiKey: String = gradleLocalProperties(rootDir, providers).getProperty("geminiKey")
+//val geminiKey: String = gradleLocalProperties(rootDir, providers).getProperty("geminiKey")
 
 android {
     namespace = "com.ml.shubham0204.docqa"
@@ -35,10 +35,10 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
-            buildConfigField("String", "geminiKey", geminiKey)
+           // buildConfigField("String", "geminiKey", geminiKey)
         }
         debug {
-            buildConfigField("String", "geminiKey", geminiKey)
+          //  buildConfigField("String", "geminiKey", geminiKey)
         }
     }
     compileOptions {
@@ -80,7 +80,6 @@ dependencies {
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.androidx.material3)
 
     // Apache POI
     implementation(libs.apache.poi)
@@ -92,6 +91,8 @@ dependencies {
 
     // iTextPDF - for parsing PDFs
     implementation(libs.itextpdf)
+    implementation(libs.androidx.datastore.preferences)
+    implementation(libs.material3)
 
     // ObjectBox - vector database
     debugImplementation(libs.objectbox.android.objectbrowser)

@@ -53,6 +53,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -344,11 +345,13 @@ private fun DocDetailDialog() {
                     Text(
                         text = doc?.docFileName ?: "",
                         style = MaterialTheme.typography.headlineSmall,
+                        color = Color.DarkGray
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = doc?.docText ?: "",
                         modifier = Modifier.height(200.dp).verticalScroll(rememberScrollState()),
+                        color = Color.DarkGray
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Row(
@@ -356,7 +359,7 @@ private fun DocDetailDialog() {
                         modifier = Modifier.fillMaxWidth(),
                     ) {
                         Button(
-                            colors = ButtonDefaults.buttonColors(containerColor = Color.Blue),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF643A71)),
                             onClick = {
                                 val sendIntent: Intent =
                                     Intent().apply {
@@ -368,13 +371,13 @@ private fun DocDetailDialog() {
                                 context.startActivity(shareIntent)
                             },
                         ) {
-                            Text(text = "Share Text")
+                            Text(text = "Share Text", color = Color.White)
                         }
                         Button(
-                            colors = ButtonDefaults.buttonColors(containerColor = Color.Blue),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6650a4)),
                             onClick = { isVisible = false },
                         ) {
-                            Text(text = "Close")
+                            Text(text = "Close", color = Color.White)
                         }
                     }
                 }
